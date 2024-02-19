@@ -105,23 +105,24 @@ class Main {
     }
 
     public static void escreverArquivoBin() {
-        File binaryFile = new File(pathBin);
 
         try {
-            FileOutputStream fos = new FileOutputStream(binaryFile);
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
 
             Filme[] filmes = lerArquivoCSV();
 
             int id = filmes[filmes.length - 1].getId(); // Pegar o último id
 
-            fos.write(id); // Escrver o último id no cabeçalho
+            binaryFile.writeInt(id); // Escrver o último id no cabeçalho
 
-            for (int i = 0; i < filmes.length; i++) {
-                fos.write(filmes[i].toBinaryArray());
+            for (Filme filme : filmes) {
+                Registro registro = new Registro(filme);
+
+                binaryFile.write(registro.toBinaryArray());
             }
 
             // Fechar o arquivo
-            fos.close();
+            binaryFile.close();
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

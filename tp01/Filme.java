@@ -1,6 +1,4 @@
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 
 class Filme {
@@ -81,6 +79,7 @@ class Filme {
         return this.genres;
     }
 
+    // Função para transformar um filme em um array de bytes
     public byte[] toBinaryArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
