@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 class Main {
@@ -31,30 +32,61 @@ class Main {
 
     public static Filme manipularLinha(String linha) {
         String[] partes = linha.split("\"");
-        String[] str = partes[0].split(",");
+        String[] str;
 
         Filme filme = new Filme();
 
-        filme.setId(Integer.parseInt(str[0]));
-        filme.setReleaseDate(str[1]);
-        filme.setTitle(str[2]);
-        filme.setVoteAvarage(Float.parseFloat(str[3]));
-        filme.setOriginalLanguage(str[4]);
-        filme.setGenres(partes[1].split(","));
+        if (partes.length > 2) {
+            str = partes[0].split(",");
+
+            filme.setId(Integer.parseInt(str[0]));
+            filme.setReleaseDate(str[1]);
+            filme.setTitle(partes[1]);
+
+            str = partes[2].split(",");
+
+            filme.setVoteAvarage(Float.parseFloat(str[1]));
+            filme.setOriginalLanguage(str[2]);
+
+            if (partes.length == 4) {
+                filme.setGenres(partes[3].split(","));
+            } else {
+                String[] genres = { str[3] };
+                filme.setGenres(genres);
+            }
+
+        } else {
+            str = partes[0].split(",");
+
+            filme.setId(Integer.parseInt(str[0]));
+            filme.setReleaseDate(str[1]);
+            filme.setTitle(str[2]);
+            filme.setVoteAvarage(Float.parseFloat(str[3]));
+            filme.setOriginalLanguage(str[4]);
+
+            if (partes.length > 1) {
+                filme.setGenres(partes[1].split(","));
+            } else {
+                filme.setGenres(new String[] {});
+            }
+
+        }
 
         return filme;
     }
 
-    public static void lerArquivoCSV() {
+    public static Filme[] lerArquivoCSV() {
+        ArrayList<Filme> filmes = new ArrayList<>();
         BufferedReader arq;
 
         try {
             arq = new BufferedReader(new FileReader(pathCSV));
-            String linha;
             arq.readLine(); // Excluir a primeira linha do arquivo
 
+            String linha;
+
             while ((linha = arq.readLine()) != null) {
-                System.out.println(linha);
+                filmes.add(manipularLinha(linha));
             }
 
         } catch (FileNotFoundException e) {
@@ -62,11 +94,16 @@ class Main {
         } catch (IOException e) {
             System.err.println("Erro ao ler o arquivo :" + e);
         }
+
+        return filmes.toArray(new Filme[0]);
     }
 
     public static void main(String[] args) {
 
         // menu();
-        lerArquivoCSV();
+
+        Filme[] filmes = lerArquivoCSV();
+        filmes[100].mostrar();
+
     }
 }
