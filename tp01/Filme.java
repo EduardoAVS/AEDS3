@@ -1,3 +1,6 @@
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 
 class Filme {
@@ -76,6 +79,23 @@ class Filme {
 
     public String[] getGenres() {
         return this.genres;
+    }
+
+    public byte[] toBinaryArray() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        dos.writeInt(this.id);
+        dos.writeUTF(this.release_date.toString());
+        dos.writeUTF(this.title);
+        dos.writeFloat(this.vote_avarage);
+        dos.writeUTF(this.original_language);
+        dos.writeInt(this.genres.length);
+        for (String genre : this.genres) {
+            dos.writeUTF(genre);
+        }
+
+        return baos.toByteArray();
     }
 
     public void mostrar() {

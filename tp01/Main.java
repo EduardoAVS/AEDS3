@@ -1,13 +1,10 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 class Main {
     private static Scanner in = new Scanner(System.in);
     private static String pathCSV = "./tp01/dados/filmes.csv";
+    private static String pathBin = "./tp01/dados/filmesBin.db";
 
     public static void menu() {
 
@@ -30,6 +27,9 @@ class Main {
         }
     }
 
+    /*
+     * Função que recebe uma linha do arquivo CSV e separa cada atributo do filme
+     */
     public static Filme manipularLinha(String linha) {
         String[] partes = linha.split("\"");
         String[] str;
@@ -75,6 +75,10 @@ class Main {
         return filme;
     }
 
+    /*
+     * Função que lê todos os filmes contidos no arquivo CSV e cria um array de
+     * filmes
+     */
     public static Filme[] lerArquivoCSV() {
         ArrayList<Filme> filmes = new ArrayList<>();
         BufferedReader arq;
@@ -89,6 +93,8 @@ class Main {
                 filmes.add(manipularLinha(linha));
             }
 
+            // Fechar o arquivo
+            arq.close();
         } catch (FileNotFoundException e) {
             System.err.println("Arquivo não encontrado :" + e);
         } catch (IOException e) {
@@ -98,12 +104,33 @@ class Main {
         return filmes.toArray(new Filme[0]);
     }
 
+    public static void escreverArquivoBin() {
+        File binaryFile = new File(pathBin);
+
+        try {
+            FileOutputStream fos = new FileOutputStream(binaryFile);
+
+            Filme[] filmes = lerArquivoCSV();
+
+            int id = filmes[filmes.length - 1].getId(); // Pegar o último id
+
+            fos.write(id); // Escrver o último id no cabeçalho
+
+            for (int i = 0; i < filmes.length; i++) {
+                fos.write(filmes[i].toBinaryArray());
+            }
+
+            // Fechar o arquivo
+            fos.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 
         // menu();
-
-        Filme[] filmes = lerArquivoCSV();
-        filmes[100].mostrar();
+        escreverArquivoBin();
 
     }
 }
