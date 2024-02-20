@@ -11,12 +11,16 @@ class Main {
         int op;
 
         System.out.println("1. Realizar carga da base de dados\n"
-                + "5. Sair do Programa");
+                + "2. Ler um registro\n"
+                + "3. Atualizar um registro\n"
+                + "4. Deletar um registro\n"
+                + "5. Criar um registro\n"
+                + "6. Sair do Programa");
 
         System.out.print("Digite sua opção : ");
         op = in.nextInt();
 
-        if (op < 1 || op > 5) {
+        if (op < 1 || op > 6) {
             System.out.println("\n---------------------------------");
             System.out.println("Opção inválida!");
             System.out.println("---------------------------------\n");
