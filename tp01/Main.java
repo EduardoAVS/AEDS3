@@ -12,9 +12,9 @@ class Main {
 
         System.out.println("1. Realizar carga da base de dados\n"
                 + "2. Ler um registro\n"
-                + "3. Atualizar um registro\n"
+                + "3. Criar um registro\n"
                 + "4. Deletar um registro\n"
-                + "5. Criar um registro\n"
+                + "5. Atualizar um registro\n"
                 + "6. Sair do Programa");
 
         System.out.print("Digite sua opção : ");
@@ -36,6 +36,31 @@ class Main {
             System.out.print("Digite o id do filme que você deseja procurar: ");
             read(in.nextInt());
             System.out.println("---------------------------------\n");
+        } else if (op == 3) {
+            Filme filme = new Filme();
+
+            System.out.println("\n---------------------------------");
+
+            System.out.print("Digite o título do filme: ");
+            filme.setTitle(in.next());
+
+            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+            filme.setReleaseDate(in.next());
+
+            System.out.print("Digite a média de votos: ");
+            filme.setVoteAvarage(in.nextFloat());
+            in.nextLine(); // Consumir a nova linha
+
+            System.out.print("Digite a língua original: ");
+            filme.setOriginalLanguage(in.nextLine());
+
+            System.out.print("Digite os gêneros desse filme: ");
+            String aux = in.nextLine();
+            String[] genres = aux.split(" ");
+            filme.setGenres(genres);
+
+            System.out.println("---------------------------------\n");
+
         }
 
         menu();
@@ -162,7 +187,7 @@ class Main {
                     }
                 }
             }
-            if(!achou){
+            if (!achou) {
                 System.out.println("\nFilme de id " + idBuscada + " não encontrado");
             }
             // Fechar o arquivo
@@ -176,19 +201,19 @@ class Main {
 
     public static boolean create(Filme filme) {
         try {
+            // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-
-            binaryFile.seek(0);
-            int id = binaryFile.readInt() + 1;
-            filme.setId(id);
-
             Registro registro = new Registro(filme);
 
-            binaryFile.seek(0);
-            binaryFile.writeInt(id);
+            binaryFile.seek(0); // Posiciona o ponteiro no início do arquivo
+            int id = binaryFile.readInt() + 1; // Lê o id do cabaçalho e o incrementa
+            filme.setId(id); // Atribui o id incrementado ao filme que vai ser adicionado ao arquivo
 
-            binaryFile.seek(binaryFile.length());
-            binaryFile.write(registro.toBinaryArray());
+            binaryFile.seek(0); // Posiciona o ponteiro no início do arquivo
+            binaryFile.writeInt(id); // Atualiza o id do cabeçalho
+
+            binaryFile.seek(binaryFile.length()); // Posiciona o ponteiro no final do arquivo
+            binaryFile.write(registro.toBinaryArray()); // Adiciona o novo registro ao arquivo
 
             // Fechar o arquivo
             binaryFile.close();
@@ -200,15 +225,6 @@ class Main {
     }
 
     public static void main(String[] args) {
-        // menu();
-
-        /*
-         * String[] genres = { "Drama", "Science Fiction", "Adventure" };
-         * Filme filme = new Filme("2014-10-26", "Interestelar", (float) 8.7, "en",
-         * genres);
-         * 
-         * create(filme);
-         */
-        read(9827);
+        menu();
     }
 }
