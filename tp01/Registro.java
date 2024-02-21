@@ -76,6 +76,6 @@ class Registro {
         filme = new Filme();
         byte[] ba = new byte[tamanho];
         binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
-        filme.fromBinaryArray(ba);
+        filme.fromBinaryArray(ba); 
     }
 }

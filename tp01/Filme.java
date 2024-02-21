@@ -107,8 +107,8 @@ class Filme {
     }
 
     public void fromBinaryArray(byte[] ba) throws IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(ba);
-        DataInputStream dis = new DataInputStream(bais);
+        ByteArrayInputStream bais = new ByteArrayInputStream(ba); // Leitura em binário
+        DataInputStream dis = new DataInputStream(bais); // Leitura com tipos primitivos
 
         id = dis.readInt();
         release_date = dis.readLong();
@@ -124,7 +124,7 @@ class Filme {
 
     @Override
     public String toString() {
-        return "\n[ id = " + this.id + ", release_date = " + getReleaseDate() + ", title = " + this.title
+        return "\n[id = " + this.id + ", release_date = " + getReleaseDate() + ", title = " + this.title
                 + ", vote_avarage = " + this.vote_avarage + ", original_language = " + this.original_language + "]\n";
     }
 
