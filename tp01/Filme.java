@@ -97,6 +97,22 @@ class Filme {
         return baos.toByteArray();
     }
 
+    public void fromBinaryArray(byte[] ba)throws IOException{
+        ByteArrayInputStream bais = new ByteArrayInputStream(ba);
+        DataInputStream dis = new DataInputStream(bais);
+        
+        id = dis.readInt();
+        release_date = LocalDate.parse(dis.readUTF()); // transformando a String data no tipo LocalDate
+        title = dis.readUTF();
+        vote_avarage = dis.readFloat();
+        original_language = dis.readUTF();
+        int numGenres = dis.readInt();
+        genres = new String[numGenres]; // Inicializando o array genres
+        for (int i = 0; i < numGenres; i++) { // Loop para ler os gêneros
+            genres[i] = dis.readUTF();
+        }
+    }
+
     public void mostrar() {
         System.out.println(id);
         System.out.println(release_date);

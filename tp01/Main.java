@@ -131,11 +131,38 @@ class Main {
             System.err.println(e.getMessage());
         }
     }
+    public static void lerArquivoBin(int idBuscada) {
+
+        try {
+            //abre o arquivo binário já escrito
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+            int id = binaryFile.readInt();
+            
+            for(int i = 0; i < id; i++){
+                Registro registro = new Registro();
+                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+                //Melhor ler so lapide primeiro
+                if(!registro.getLapide()){
+                    //ler objeto aqui
+                    if(registro.getFilmeById() == idBuscada){
+                        System.out.println(registro.toString());
+                    }
+                }
+            }
+            // Fechar o arquivo
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
 
     public static void main(String[] args) {
 
         // menu();
         escreverArquivoBin();
+
+        // teste ler arquivo
+        lerArquivoBin(100);
 
     }
 }

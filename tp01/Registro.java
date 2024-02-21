@@ -7,10 +7,37 @@ class Registro {
     private int tamanho;
     private Filme filme;
 
+    // Getters
+    public boolean getLapide(){
+        return lapide;
+    }
+    public int getTamanho(){
+        return tamanho;
+    }
+    public int getFilmeById(){
+        return filme.getId();
+    }
+
+    //Setters
+    public void setLapide(boolean lapide){
+        this.lapide = lapide;
+    }
+
+    //imprimir informaões do filme
+    public String toString(){
+        return filme.toString();
+    }
+
     // Construtores
+    public Registro() throws IOException {
+        this.filme = null;
+        this.lapide = false;
+        this.tamanho = 0;
+    }
+
     public Registro(Filme filme) throws IOException {
         this.filme = filme;
-        this.lapide = true;
+        this.lapide = false;
         this.tamanho = filme.toBinaryArray().length;
     }
 
@@ -30,5 +57,17 @@ class Registro {
         dos.write(filme.toBinaryArray());
 
         return baos.toByteArray();
+    }
+
+    public void fromBinaryArray(RandomAccessFile binaryFile) throws IOException{ // Recebe RandomAccessFile porque precisa ler o tamanho para declarar o vetor de bytes
+
+        lapide = binaryFile.readBoolean();
+        tamanho = binaryFile.readInt();
+
+        // Criando objeto filme para atribuir os valores lidos
+        filme = new Filme();
+        byte[] ba = new byte[tamanho];
+        binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
+        filme.fromBinaryArray(ba);
     }
 }
