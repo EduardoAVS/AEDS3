@@ -127,7 +127,7 @@ class Main {
 
             int id = filmes[filmes.length - 1].getId(); // Pegar o último id
 
-            binaryFile.writeInt(id); // Escrver o último id no cabeçalho
+            binaryFile.writeInt(id); // Escrever o último id no cabeçalho
 
             for (Filme filme : filmes) {
                 Registro registro = new Registro(filme);
@@ -148,17 +148,22 @@ class Main {
             // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt();
-
-            for (int i = 0; i < id; i++) {
-                Registro registro = new Registro();
+            boolean achou = false;
+            for (int i = 0; i <= id; i++) {
+                Registro registro = new Registro(); // Cria registro vazio
                 registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
-                // Melhor ler so lapide primeiro
-                if (!registro.getLapide()) {
-                    // ler objeto aqui
+
+                if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
+
                     if (registro.getFilmeById() == idBuscada) {
+                        achou = true;
                         System.out.println(registro.toString());
+                        break;
                     }
                 }
+            }
+            if(!achou){
+                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
             }
             // Fechar o arquivo
             binaryFile.close();
