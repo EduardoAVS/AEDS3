@@ -27,8 +27,18 @@ class Main {
 
             menu();
         } else if (op == 1) {
-
+            escreverArquivoBin();
+            System.out.println("\n---------------------------------");
+            System.out.println("Arquivo criado com sucesso!");
+            System.out.println("---------------------------------\n");
+        } else if (op == 2) {
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja procurar: ");
+            read(in.nextInt());
+            System.out.println("---------------------------------\n");
         }
+
+        menu();
     }
 
     /*
@@ -131,20 +141,21 @@ class Main {
             System.err.println(e.getMessage());
         }
     }
-    public static void lerArquivoBin(int idBuscada) {
+
+    public static void read(int idBuscada) {
 
         try {
-            //abre o arquivo binário já escrito
+            // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt();
-            
-            for(int i = 0; i < id; i++){
+
+            for (int i = 0; i < id; i++) {
                 Registro registro = new Registro();
                 registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
-                //Melhor ler so lapide primeiro
-                if(!registro.getLapide()){
-                    //ler objeto aqui
-                    if(registro.getFilmeById() == idBuscada){
+                // Melhor ler so lapide primeiro
+                if (!registro.getLapide()) {
+                    // ler objeto aqui
+                    if (registro.getFilmeById() == idBuscada) {
                         System.out.println(registro.toString());
                     }
                 }
@@ -156,13 +167,25 @@ class Main {
         }
     }
 
+    public static void create(Registro registro) {
+
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+
+            int id = binaryFile.readInt() + 1;
+            registro.getFilme().setId(id);
+
+            binaryFile.seek(0);
+            binaryFile.writeInt(id);
+
+            // Fechar o arquivo
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
-
-        // menu();
-        escreverArquivoBin();
-
-        // teste ler arquivo
-        lerArquivoBin(100);
-
+        menu();
     }
 }

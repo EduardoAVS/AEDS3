@@ -8,23 +8,29 @@ class Registro {
     private Filme filme;
 
     // Getters
-    public boolean getLapide(){
-        return lapide;
-    }
-    public int getTamanho(){
-        return tamanho;
-    }
-    public int getFilmeById(){
-        return filme.getId();
+    public boolean getLapide() {
+        return this.lapide;
     }
 
-    //Setters
-    public void setLapide(boolean lapide){
+    public int getTamanho() {
+        return this.tamanho;
+    }
+
+    public Filme getFilme() {
+        return this.filme;
+    }
+
+    public int getFilmeById() {
+        return this.filme.getId();
+    }
+
+    // Setters
+    public void setLapide(boolean lapide) {
         this.lapide = lapide;
     }
 
-    //imprimir informaões do filme
-    public String toString(){
+    // imprimir informaões do filme
+    public String toString() {
         return filme.toString();
     }
 
@@ -59,7 +65,9 @@ class Registro {
         return baos.toByteArray();
     }
 
-    public void fromBinaryArray(RandomAccessFile binaryFile) throws IOException{ // Recebe RandomAccessFile porque precisa ler o tamanho para declarar o vetor de bytes
+    // Recebe RandomAccessFile porque precisa ler o tamanho para declarar o vetor de
+    // bytes
+    public void fromBinaryArray(RandomAccessFile binaryFile) throws IOException {
 
         lapide = binaryFile.readBoolean();
         tamanho = binaryFile.readInt();

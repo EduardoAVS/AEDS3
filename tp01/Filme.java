@@ -1,15 +1,18 @@
 import java.io.*;
-import java.time.LocalDate;
+import java.util.*;
+import java.text.*;
 
 class Filme {
 
     // Atributos
     protected int id;
-    protected LocalDate release_date;
+    protected long release_date;
     protected String title;
     protected float vote_avarage;
     protected String original_language;
     protected String[] genres;
+
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd"); // Formatador de datas
 
     // Construtores
     public Filme() {
@@ -35,7 +38,13 @@ class Filme {
     }
 
     public void setReleaseDate(String date) {
-        this.release_date = LocalDate.parse(date);
+        try {
+            Date aux = format.parse(date);
+            this.release_date = aux.getTime() / 1000;
+
+        } catch (ParseException e) {
+            System.err.println(e);
+        }
     }
 
     public void setTitle(String title) {
@@ -59,8 +68,8 @@ class Filme {
         return this.id;
     }
 
-    public LocalDate getReleasDate() {
-        return this.release_date;
+    public String getReleaseDate() {
+        return format.format(new Date(this.release_date * 1000));
     }
 
     public String getTitle() {
@@ -85,7 +94,7 @@ class Filme {
         DataOutputStream dos = new DataOutputStream(baos);
 
         dos.writeInt(this.id);
-        dos.writeUTF(this.release_date.toString());
+        dos.writeLong(this.release_date);
         dos.writeUTF(this.title);
         dos.writeFloat(this.vote_avarage);
         dos.writeUTF(this.original_language);
@@ -97,12 +106,12 @@ class Filme {
         return baos.toByteArray();
     }
 
-    public void fromBinaryArray(byte[] ba)throws IOException{
+    public void fromBinaryArray(byte[] ba) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         DataInputStream dis = new DataInputStream(bais);
-        
+
         id = dis.readInt();
-        release_date = LocalDate.parse(dis.readUTF()); // transformando a String data no tipo LocalDate
+        release_date = dis.readLong();
         title = dis.readUTF();
         vote_avarage = dis.readFloat();
         original_language = dis.readUTF();
@@ -113,20 +122,10 @@ class Filme {
         }
     }
 
-    public void mostrar() {
-        System.out.println(id);
-        System.out.println(release_date);
-        System.out.println(title);
-        System.out.println(vote_avarage);
-        System.out.println(original_language);
-        for (String genre : genres) {
-            System.out.print(genre + " ");
-        }
-    }
-
     @Override
     public String toString() {
-        return "[ id = " + this.id + ", release_date = " + this.release_date + ", title = " + this.title + "]";
+        return "\n[ id = " + this.id + ", release_date = " + getReleaseDate() + ", title = " + this.title
+                + ", vote_avarage = " + this.vote_avarage + ", original_language = " + this.original_language + "]\n";
     }
 
 }
