@@ -23,8 +23,8 @@ class Filme {
         setGenres(new String[] {});
     }
 
-    public Filme(int id, String date, String title, float vote_avarage, String originalString, String[] genres) {
-        setId(id);
+    public Filme(String date, String title, float vote_avarage, String originalString, String[] genres) {
+        setId(-1);
         setReleaseDate(date);
         setTitle(title);
         setVoteAvarage(vote_avarage);

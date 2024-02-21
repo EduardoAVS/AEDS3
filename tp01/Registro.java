@@ -35,7 +35,7 @@ class Registro {
     }
 
     // Construtores
-    public Registro() throws IOException {
+    public Registro() {
         this.filme = null;
         this.lapide = false;
         this.tamanho = 0;

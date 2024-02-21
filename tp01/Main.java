@@ -142,7 +142,7 @@ class Main {
         }
     }
 
-    public static void read(int idBuscada) {
+    public static boolean read(int idBuscada) {
 
         try {
             // Abre o arquivo binário já escrito
@@ -162,30 +162,48 @@ class Main {
             }
             // Fechar o arquivo
             binaryFile.close();
+            return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
+            return false;
         }
     }
 
-    public static void create(Registro registro) {
-
+    public static boolean create(Filme filme) {
         try {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
 
+            binaryFile.seek(0);
             int id = binaryFile.readInt() + 1;
-            registro.getFilme().setId(id);
+            filme.setId(id);
+
+            Registro registro = new Registro(filme);
 
             binaryFile.seek(0);
             binaryFile.writeInt(id);
 
+            binaryFile.seek(binaryFile.length());
+            binaryFile.write(registro.toBinaryArray());
+
             // Fechar o arquivo
             binaryFile.close();
+            return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
+            return false;
         }
     }
 
     public static void main(String[] args) {
-        menu();
+        // menu();
+
+        /*
+         * String[] genres = { "Drama", "Science Fiction", "Adventure" };
+         * Filme filme = new Filme("2014-10-26", "Interestelar", (float) 8.7, "en",
+         * genres);
+         * 
+         * create(filme);
+         */
+        read(9827);
     }
 }
