@@ -77,4 +77,16 @@ class Registro {
         binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
         filme.fromBinaryArray(ba);  // Lê os dados binários e converte em dados de filme
     }
+
+    public void fbaLapideTamanho(RandomAccessFile binaryFile) throws IOException {
+        lapide = binaryFile.readBoolean();
+        tamanho = binaryFile.readInt();
+    }
+
+    public void fbaFilme(RandomAccessFile binaryFile) throws IOException{
+        filme = new Filme(); // Criando objeto filme para atribuir os valores lidos
+        byte[] ba = new byte[tamanho]; // Alocando um vetor de byte com o tamanho do filme
+        binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
+        filme.fromBinaryArray(ba);  // Lê os dados binários e converte em dados de filme
+    }
 }

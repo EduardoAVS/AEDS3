@@ -182,14 +182,19 @@ class Main {
 
             while(in.hasNextLine()) {
                 Registro registro = new Registro(); // Cria registro vazio
-                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+                registro.fbaLapideTamanho(binaryFile); // Lê a lapide e o tamanho em binario
 
+                long pos = binaryFile.getFilePointer(); // Posicao do proximo registro
                 if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
 
+                    registro.fbaFilme(binaryFile);// Informacões do filme lidas 
                     if (registro.getFilmeById() == idBuscada) {
                         System.out.println(registro.toString()); // Transforma o registro em texto
                         return true; // Retorna true se encontrar o id
                     }
+                }
+                else{
+                    binaryFile.seek(pos + registro.getTamanho());
                 }
             }
               System.out.println("\nFilme de id " + idBuscada + " não encontrado");
@@ -235,19 +240,22 @@ class Main {
             int id = binaryFile.readInt();
 
             while(in.hasNextLine()) {
-                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
                 Registro registro = new Registro(); // Cria registro vazio
-                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
+                registro.fbaLapideTamanho(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
 
+                long posFilme = binaryFile.getFilePointer(); // Posicao do proximo registro
                 if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
-
+                    registro.fbaFilme(binaryFile);
                     if (registro.getFilmeById() == idBuscado) {
-
                         binaryFile.seek(pos); // Volta o ponteiro para a posicao inicial do registro(lápide)
                         binaryFile.writeBoolean(true);; // Coloca a lápide como true
                         System.out.println("\nFilme com id "+ idBuscado + " deletado com sucesso\n");
                         return true; // Retorna true se encontrar o id
                     }
+                }
+                else{
+                    binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o próximo
                 }
             }
             System.out.println("\nFilme de id " + idBuscado + " não encontrado");
@@ -267,13 +275,15 @@ class Main {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt(); // Último id escrito no arquivo
 
-            for (int i = 0; i <= id; i++) {
-                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
+            for(int i = 0 ; i <= id; i++) {
                 Registro registro = new Registro(); // Cria registro vazio
-                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
+                registro.fbaLapideTamanho(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+
+                long posFilme = binaryFile.getFilePointer(); // Posicao do proximo registro
 
                 if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
-
+                    registro.fbaFilme(binaryFile);
                     if (registro.getFilmeById() == filme.getId()) {
 
                         Registro novoRegistro = new Registro(filme); // Criando registro com o filme atualizado
@@ -293,6 +303,9 @@ class Main {
 
                         System.out.println("\nFilme com id "+ filme.getId() + " atualizado com sucesso\n");
                         return true; // Retorna true se encontrar o id
+                    }
+                    else{
+                        binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o próximo
                     }
                 }
             }
