@@ -72,10 +72,9 @@ class Registro {
         lapide = binaryFile.readBoolean();
         tamanho = binaryFile.readInt();
 
-        // Criando objeto filme para atribuir os valores lidos
-        filme = new Filme();
-        byte[] ba = new byte[tamanho];
+        filme = new Filme(); // Criando objeto filme para atribuir os valores lidos
+        byte[] ba = new byte[tamanho]; // Alocando um vetor de byte com o tamanho do filme
         binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
-        filme.fromBinaryArray(ba); 
+        filme.fromBinaryArray(ba);  // Lê os dados binários e converte em dados de filme
     }
 }

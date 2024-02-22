@@ -61,7 +61,13 @@ class Main {
 
             System.out.println("---------------------------------\n");
 
+        } else if(op == 4){
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja deletar: ");
+            delete(in.nextInt());
+            System.out.println("---------------------------------\n");
         }
+
 
         menu();
     }
@@ -173,7 +179,7 @@ class Main {
             // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt();
-            boolean achou = false;
+
             for (int i = 0; i <= id; i++) {
                 Registro registro = new Registro(); // Cria registro vazio
                 registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
@@ -181,18 +187,16 @@ class Main {
                 if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
 
                     if (registro.getFilmeById() == idBuscada) {
-                        achou = true;
-                        System.out.println(registro.toString());
-                        break;
+                        System.out.println(registro.toString()); // Transforma o registro em texto
+                        return true; // Retorna true se encontrar o id
                     }
                 }
             }
-            if (!achou) {
-                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
-            }
+              System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+
             // Fechar o arquivo
             binaryFile.close();
-            return true;
+            return false; // Retorna falso se não encontrar o id
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return false;
@@ -218,6 +222,39 @@ class Main {
             // Fechar o arquivo
             binaryFile.close();
             return true;
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean delete(int idBuscado){
+        try {
+            // Abre o arquivo binário já escrito
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+            int id = binaryFile.readInt();
+
+            for (int i = 0; i <= id; i++) {
+                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
+                Registro registro = new Registro(); // Cria registro vazio
+                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+
+                if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
+
+                    if (registro.getFilmeById() == idBuscado) {
+
+                        binaryFile.seek(pos); // Volta o ponteiro para a posicao inicial do registro(lápide)
+                        binaryFile.writeBoolean(true);; // Coloca a lápide como true
+                        System.out.println("\nFilme com id "+ idBuscado + " deletado com sucesso\n");
+                        return true; // Retorna true se encontrar o id
+                    }
+                }
+            }
+            System.out.println("\nFilme de id " + idBuscado + " não encontrado");
+
+            // Fechar o arquivo
+            binaryFile.close();
+            return false; // Retorna falso se não encontrar o id
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return false;
