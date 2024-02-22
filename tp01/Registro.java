@@ -23,13 +23,13 @@ class Registro {
     public int getFilmeById() {
         return this.filme.getId();
     }
-
+    
     // Setters
-    public void setLapide(boolean lapide) {
-        this.lapide = lapide;
+    public void setTamanho(int tamanho){
+        this.tamanho = tamanho;
     }
 
-    // imprimir informaões do filme
+    // imprimir informacões do filme
     public String toString() {
         return filme.toString();
     }

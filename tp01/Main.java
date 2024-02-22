@@ -180,7 +180,7 @@ class Main {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt();
 
-            for (int i = 0; i <= id; i++) {
+            while(in.hasNextLine()) {
                 Registro registro = new Registro(); // Cria registro vazio
                 registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
 
@@ -234,7 +234,7 @@ class Main {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt();
 
-            for (int i = 0; i <= id; i++) {
+            while(in.hasNextLine()) {
                 long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
                 Registro registro = new Registro(); // Cria registro vazio
                 registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
@@ -261,7 +261,58 @@ class Main {
         }
     }
 
+    public static boolean update(Filme filme){
+        try {
+            // Abre o arquivo binário já escrito
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+            int id = binaryFile.readInt(); // Último id escrito no arquivo
+
+            for (int i = 0; i <= id; i++) {
+                long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
+                Registro registro = new Registro(); // Cria registro vazio
+                registro.fromBinaryArray(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
+
+                if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
+
+                    if (registro.getFilmeById() == filme.getId()) {
+
+                        Registro novoRegistro = new Registro(filme); // Criando registro com o filme atualizado
+                        if(novoRegistro.getTamanho() < registro.getTamanho()){
+
+                            binaryFile.seek(pos); // Mudando a posicao do ponteiro para o inicio do registro
+                            novoRegistro.setTamanho(registro.getTamanho()); // O tamanho do novo registro deve ser o mesmo do anterior
+                            binaryFile.write(novoRegistro.toBinaryArray()); // Adiciona o novo registro ao arquivo
+
+                        }
+                        else{
+                            binaryFile.seek(pos); // Mudando a posicao do ponteiro para o inicio do registro
+                            binaryFile.writeBoolean(true);; // Coloca a lápide como true
+                            binaryFile.seek(binaryFile.length()); // Posiciona o ponteiro no final do arquivo
+                            binaryFile.write(novoRegistro.toBinaryArray()); // Adiciona o novo registro ao arquivo
+                        }
+
+                        System.out.println("\nFilme com id "+ filme.getId() + " atualizado com sucesso\n");
+                        return true; // Retorna true se encontrar o id
+                    }
+                }
+            }
+            System.out.println("\nFilme de id " + filme.getId() + " não encontrado");
+
+            // Fechar o arquivo
+            binaryFile.close();
+            return false; // Retorna falso se não encontrar o id
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+    }
+
     public static void main(String[] args) {
+        escreverArquivoBin();
+        String[] s = {"acao", "comedia", "aventura", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"};
+        Filme f = new Filme("1111-11-11", "Teste", 6, "pt", s);
+        f.setId(1);
+        update(f);
         menu();
     }
 }
