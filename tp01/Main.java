@@ -41,6 +41,47 @@ class Main {
 
             System.out.println("\n---------------------------------");
 
+            System.out.print("\nDigite o título do filme: ");
+            filme.setTitle(in.next());
+
+            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+            filme.setReleaseDate(in.next());
+
+            System.out.print("Digite a média de votos: ");
+            filme.setVoteAvarage(in.nextFloat());
+            in.nextLine(); // Consumir a nova linha
+
+            System.out.print("Digite a língua original: ");
+            filme.setOriginalLanguage(in.nextLine());
+
+            System.out.print("Digite os gêneros desse filme(separe com vírgula): ");
+            String aux = in.nextLine();
+            String[] genres = aux.split(",");
+            filme.setGenres(genres);
+
+            if (create(filme)) {
+                System.out.println("\nFilme adicionado com sucesso!");
+            } else {
+                System.out.println("\nErro ao adicionar o filme!");
+            }
+
+            System.out.println("---------------------------------\n");
+
+        } else if (op == 4) {
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja deletar: ");
+            if (!delete(in.nextInt())) {
+                System.out.print("Erro ao deletar o filme!");
+            }
+            System.out.println("---------------------------------\n");
+        } else if (op == 5) {
+            Filme filme = new Filme();
+
+            System.out.println("\n---------------------------------");
+
+            System.out.print("Digite o id do filme que você deseja atualizar: ");
+            filme.setId(in.nextInt());
+
             System.out.print("Digite o título do filme: ");
             filme.setTitle(in.next());
 
@@ -54,22 +95,20 @@ class Main {
             System.out.print("Digite a língua original: ");
             filme.setOriginalLanguage(in.nextLine());
 
-            System.out.print("Digite os gêneros desse filme: ");
+            System.out.print("Digite os gêneros desse filme(separe com vírgula): ");
             String aux = in.nextLine();
-            String[] genres = aux.split(" ");
+            String[] genres = aux.split(",");
             filme.setGenres(genres);
 
+            update(filme);
+
             System.out.println("---------------------------------\n");
 
-        } else if(op == 4){
-            System.out.println("\n---------------------------------");
-            System.out.print("Digite o id do filme que você deseja deletar: ");
-            delete(in.nextInt());
-            System.out.println("---------------------------------\n");
         }
 
-
-        menu();
+        if (op != 6) {
+            menu();
+        }
     }
 
     /*
@@ -173,38 +212,41 @@ class Main {
         }
     }
 
-    public static boolean read(int idBuscada) {
+    public static void read(int idBuscada) {
 
         try {
             // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            int id = binaryFile.readInt();
+            binaryFile.readInt();
 
-            while(in.hasNextLine()) {
+            // Variável que controla o fim do arquivo
+            boolean eof = false;
+            while (!eof) {
                 Registro registro = new Registro(); // Cria registro vazio
                 registro.fbaLapideTamanho(binaryFile); // Lê a lapide e o tamanho em binario
 
                 long pos = binaryFile.getFilePointer(); // Posicao do proximo registro
                 if (!registro.getLapide()) { // Se lápide está marcado o registro foi excluido e deve ser ignorado
 
-                    registro.fbaFilme(binaryFile);// Informacões do filme lidas 
+                    registro.fbaFilme(binaryFile);// Informacões do filme lidas
                     if (registro.getFilmeById() == idBuscada) {
                         System.out.println(registro.toString()); // Transforma o registro em texto
-                        return true; // Retorna true se encontrar o id
+                        break;
                     }
-                }
-                else{
+                } else {
                     binaryFile.seek(pos + registro.getTamanho());
                 }
+                // Verifica se chegou ao fim do arquivo
+                eof = (binaryFile.getFilePointer() == binaryFile.length());
             }
-              System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+            if (eof) {
+                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+            }
 
             // Fechar o arquivo
             binaryFile.close();
-            return false; // Retorna falso se não encontrar o id
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            return false;
         }
     }
 
@@ -233,13 +275,13 @@ class Main {
         }
     }
 
-    public static boolean delete(int idBuscado){
+    public static boolean delete(int idBuscado) {
         try {
             // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            int id = binaryFile.readInt();
+            binaryFile.readInt();
 
-            while(in.hasNextLine()) {
+            while (in.hasNextLine()) {
                 Registro registro = new Registro(); // Cria registro vazio
                 long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
                 registro.fbaLapideTamanho(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
@@ -249,13 +291,14 @@ class Main {
                     registro.fbaFilme(binaryFile);
                     if (registro.getFilmeById() == idBuscado) {
                         binaryFile.seek(pos); // Volta o ponteiro para a posicao inicial do registro(lápide)
-                        binaryFile.writeBoolean(true);; // Coloca a lápide como true
-                        System.out.println("\nFilme com id "+ idBuscado + " deletado com sucesso\n");
+                        binaryFile.writeBoolean(true);
+                        ; // Coloca a lápide como true
+                        System.out.println("\nFilme com id " + idBuscado + " deletado com sucesso\n");
                         return true; // Retorna true se encontrar o id
                     }
-                }
-                else{
-                    binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o próximo
+                } else {
+                    binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o
+                                                                       // próximo
                 }
             }
             System.out.println("\nFilme de id " + idBuscado + " não encontrado");
@@ -269,13 +312,13 @@ class Main {
         }
     }
 
-    public static boolean update(Filme filme){
+    public static boolean update(Filme filme) {
         try {
             // Abre o arquivo binário já escrito
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
             int id = binaryFile.readInt(); // Último id escrito no arquivo
 
-            for(int i = 0 ; i <= id; i++) {
+            for (int i = 0; i <= id; i++) {
                 Registro registro = new Registro(); // Cria registro vazio
                 long pos = binaryFile.getFilePointer(); // Posicao do início do registro(lápide)
                 registro.fbaLapideTamanho(binaryFile); // Passa o arquivo diretamente para o método fromBinaryArray
@@ -287,25 +330,25 @@ class Main {
                     if (registro.getFilmeById() == filme.getId()) {
 
                         Registro novoRegistro = new Registro(filme); // Criando registro com o filme atualizado
-                        if(novoRegistro.getTamanho() < registro.getTamanho()){
+                        if (novoRegistro.getTamanho() < registro.getTamanho()) {
 
                             binaryFile.seek(pos); // Mudando a posicao do ponteiro para o inicio do registro
-                            novoRegistro.setTamanho(registro.getTamanho()); // O tamanho do novo registro deve ser o mesmo do anterior
+                            novoRegistro.setTamanho(registro.getTamanho()); // O tamanho do novo registro deve ser o
+                                                                            // mesmo do anterior
                             binaryFile.write(novoRegistro.toBinaryArray()); // Adiciona o novo registro ao arquivo
 
-                        }
-                        else{
+                        } else {
                             binaryFile.seek(pos); // Mudando a posicao do ponteiro para o inicio do registro
-                            binaryFile.writeBoolean(true);; // Coloca a lápide como true
+                            binaryFile.writeBoolean(true);// Coloca a lápide como true
                             binaryFile.seek(binaryFile.length()); // Posiciona o ponteiro no final do arquivo
                             binaryFile.write(novoRegistro.toBinaryArray()); // Adiciona o novo registro ao arquivo
                         }
 
-                        System.out.println("\nFilme com id "+ filme.getId() + " atualizado com sucesso\n");
+                        System.out.println("\nFilme com id " + filme.getId() + " atualizado com sucesso\n");
                         return true; // Retorna true se encontrar o id
-                    }
-                    else{
-                        binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o próximo
+                    } else {
+                        binaryFile.seek(posFilme + registro.getTamanho()); // Caso o registro foi deletado pula para o
+                                                                           // próximo
                     }
                 }
             }
@@ -321,11 +364,6 @@ class Main {
     }
 
     public static void main(String[] args) {
-        escreverArquivoBin();
-        String[] s = {"acao", "comedia", "aventura", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"};
-        Filme f = new Filme("1111-11-11", "Teste", 6, "pt", s);
-        f.setId(1);
-        update(f);
         menu();
     }
 }

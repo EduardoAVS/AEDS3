@@ -124,8 +124,15 @@ class Filme {
 
     @Override
     public String toString() {
-        return "\n[id = " + this.id + ", release_date = " + getReleaseDate() + ", title = " + this.title
-                + ", vote_avarage = " + this.vote_avarage + ", original_language = " + this.original_language + "]\n";
+        String str = "\n[id = " + this.id + ", release_date = " + getReleaseDate() + ", title = " + this.title
+                + ", vote_avarage = " + this.vote_avarage + ", original_language = " + this.original_language
+                + ", genres = { ";
+
+        for (int i = 0; i < this.genres.length; i++) {
+            str = str.concat(genres[i] + ((i != this.genres.length - 1) ? "; " : " "));
+        }
+        str = str.concat("} ]\n");
+        return str;
     }
 
 }
