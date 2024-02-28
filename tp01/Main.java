@@ -303,9 +303,10 @@ class Main {
     public static boolean update(Filme filme) {
         try {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            int id = binaryFile.readInt();
+           binaryFile.readInt();
 
-            for (int i = 0; i <= id; i++) {
+           boolean eof = false;
+            while (!eof) {
                 Registro registro = new Registro();
                 long pos = binaryFile.getFilePointer();
                 registro.fbaLapideTamanho(binaryFile);
@@ -314,10 +315,11 @@ class Main {
 
                 if (!registro.getLapide()) {
                     registro.fbaFilme(binaryFile);
+
                     if (registro.getFilmeById() == filme.getId()) {
 
                         Registro novoRegistro = new Registro(filme);
-                        if (novoRegistro.getTamanho() < registro.getTamanho()) {
+                        if (novoRegistro.getTamanho() <= registro.getTamanho()) {
 
                             binaryFile.seek(pos);
                             novoRegistro.setTamanho(registro.getTamanho());
@@ -336,8 +338,12 @@ class Main {
                         binaryFile.seek(posFilme + registro.getTamanho());
                     }
                 }
+                // Verifica se chegou ao fim do arquivo
+                eof = (binaryFile.getFilePointer() == binaryFile.length());
             }
-            System.out.println("\nFilme de id " + filme.getId() + " não encontrado");
+            if (eof) {
+                System.out.println("\nFilme de id " + filme.getId() + " não encontrado");
+            }
 
             // Fechar o arquivo
             binaryFile.close();
