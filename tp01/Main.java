@@ -5,6 +5,7 @@ class Main {
     private static Scanner in = new Scanner(System.in);
     private static final String pathCSV = "./tp01/dados/filmes.csv";
     private static final String pathBin = "./tp01/dados/filmesBin.db";
+    private static final int bloco = 1000;
 
     public static void menu() {
 
@@ -51,10 +52,10 @@ class Main {
             filme.setVoteAvarage(in.nextFloat());
             in.nextLine(); // Consumir a nova linha
 
-            System.out.print("Digite a língua original: ");
+            System.out.print("Digite a língua original (sigla com apenas duas letras): ");
             filme.setOriginalLanguage(in.nextLine());
 
-            System.out.print("Digite os gêneros desse filme(separe com vírgula): ");
+            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
             String aux = in.nextLine();
             String[] genres = aux.split(",");
             filme.setGenres(genres);
@@ -92,10 +93,10 @@ class Main {
             filme.setVoteAvarage(in.nextFloat());
             in.nextLine(); // Consumir a nova linha
 
-            System.out.print("Digite a língua original: ");
+            System.out.print("Digite a língua original (sigla com apenas duas letras): ");
             filme.setOriginalLanguage(in.nextLine());
 
-            System.out.print("Digite os gêneros desse filme(separe com vírgula): ");
+            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
             String aux = in.nextLine();
             String[] genres = aux.split(",");
             filme.setGenres(genres);
@@ -347,7 +348,157 @@ class Main {
         }
     }
 
+    public static int registersCounter() {
+        int count = 0;
+
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "r");
+
+            long pos = binaryFile.getFilePointer();
+            binaryFile.seek(pos + 4);
+
+            while (pos < binaryFile.length()) {
+                boolean lapide = binaryFile.readBoolean();
+
+                if (lapide == false) {
+                    count++;
+                }
+
+                int tamanho = binaryFile.readInt();
+                pos = binaryFile.getFilePointer();
+                binaryFile.seek(pos + tamanho);
+                pos = binaryFile.getFilePointer();
+            }
+
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+
+        return count;
+    }
+
+    public static void distribuicao() {
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "r");
+            RandomAccessFile tmp1 = new RandomAccessFile("./tp01/temp/tmp1.db", "rw");
+            RandomAccessFile tmp2 = new RandomAccessFile("./tp01/temp/tmp2.db", "rw");
+
+            long pos = binaryFile.getFilePointer();
+            binaryFile.seek(pos + 4);
+
+            int tmp = 0;
+            boolean eof = false;
+            ArrayList<Registro> registros;
+
+            while (!eof) {
+                registros = new ArrayList<>();
+                for (int i = 0; i < bloco; i++) {
+                    try {
+                        boolean lapide = binaryFile.readBoolean();
+                        int tamanho = binaryFile.readInt();
+                        pos = binaryFile.getFilePointer();
+
+                        if (lapide == false) {
+                            Registro registro = new Registro();
+                            registro.setTamanho(tamanho);
+                            registro.fbaFilme(binaryFile);
+                            registros.add(registro);
+                        } else {
+                            binaryFile.seek(pos + tamanho);
+                        }
+
+                    } catch (EOFException e) {
+                        eof = true;
+                        break;
+                    }
+                }
+
+                Collections.sort(registros, Comparator.comparingInt(Registro::getFilmeById));
+
+                RandomAccessFile temp = (tmp % 2 == 0) ? tmp1 : tmp2;
+
+                for (Registro registro : registros) {
+                    temp.seek(temp.length());
+                    temp.write(registro.toBinaryArray());
+                }
+
+                tmp++;
+
+            }
+
+            binaryFile.close();
+            tmp1.close();
+            tmp2.close();
+
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public static void intercalacao() {
+        int qtdRegistros = registersCounter();
+        int qtdIntercalacao = (int) Math.ceil((double) qtdRegistros / bloco) / 2;
+
+        /*
+         * tmp1.seek(0);
+         * tmp2.seek(0);
+         * 
+         * for (int i = 0; i < qtdIntercalacao; i++) {
+         * RandomAccessFile target = (i % 2 == 0) ? tmp3 : tmp4;
+         * int contador = 0;
+         * 
+         * while (contador < bloco && tmp1.getFilePointer() < tmp1.length()
+         * && tmp2.getFilePointer() < tmp2.length()) {
+         * Registro registro1 = new Registro();
+         * registro1.fromBinaryArray(tmp1);
+         * 
+         * Registro registro2 = new Registro();
+         * registro2.fromBinaryArray(tmp2);
+         * 
+         * if (registro1.getFilmeById() < registro2.getFilmeById()) {
+         * target.seek(target.length());
+         * target.write(registro1.toBinaryArray());
+         * } else {
+         * target.seek(target.length());
+         * target.write(registro2.toBinaryArray());
+         * }
+         * 
+         * contador++;
+         * }
+         * 
+         * while (tmp1.getFilePointer() < tmp1.length()) {
+         * Registro registro1 = new Registro();
+         * registro1.fromBinaryArray(tmp1);
+         * target.seek(target.length());
+         * target.write(registro1.toBinaryArray());
+         * }
+         * 
+         * while (tmp2.getFilePointer() < tmp2.length()) {
+         * Registro registro2 = new Registro();
+         * registro2.fromBinaryArray(tmp2);
+         * target.seek(target.length());
+         * target.write(registro2.toBinaryArray());
+         * }
+         * 
+         * tmp1.setLength(0);
+         * tmp2.setLength(0);
+         * 
+         * // Checar se apenas um dos arquivos está vazio
+         * if (tmp1.length() == 0 && tmp2.length() == 0) {
+         * eof = true;
+         * }
+         * }
+         */
+    }
+
+    public static void ordenacaoExterna() {
+        distribuicao();
+        // intercalacao();
+    }
+
     public static void main(String[] args) {
         menu();
+        // ordenacaoExterna();
     }
 }
