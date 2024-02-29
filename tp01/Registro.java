@@ -23,10 +23,14 @@ class Registro {
     public int getFilmeById() {
         return this.filme.getId();
     }
-    
+
     // Setters
-    public void setTamanho(int tamanho){
+    public void setTamanho(int tamanho) {
         this.tamanho = tamanho;
+    }
+
+    public void setFilme(Filme filme) {
+        this.filme = filme;
     }
 
     // imprimir informacões do filme
@@ -75,7 +79,7 @@ class Registro {
         filme = new Filme(); // Criando objeto filme para atribuir os valores lidos
         byte[] ba = new byte[tamanho]; // Alocando um vetor de byte com o tamanho do filme
         binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
-        filme.fromBinaryArray(ba);  // Lê os dados binários e converte em dados de filme
+        filme.fromBinaryArray(ba); // Lê os dados binários e converte em dados de filme
     }
 
     public void fbaLapideTamanho(RandomAccessFile binaryFile) throws IOException {
@@ -83,10 +87,10 @@ class Registro {
         tamanho = binaryFile.readInt();
     }
 
-    public void fbaFilme(RandomAccessFile binaryFile) throws IOException{
+    public void fbaFilme(RandomAccessFile binaryFile) throws IOException {
         filme = new Filme(); // Criando objeto filme para atribuir os valores lidos
         byte[] ba = new byte[tamanho]; // Alocando um vetor de byte com o tamanho do filme
         binaryFile.read(ba); // Lê o array de bytes correspondente aos dados do filme
-        filme.fromBinaryArray(ba);  // Lê os dados binários e converte em dados de filme
+        filme.fromBinaryArray(ba); // Lê os dados binários e converte em dados de filme
     }
 }
