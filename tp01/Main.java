@@ -205,14 +205,13 @@ class Main {
     /*
      * Função responsável por ler um registro no arquivo binário
      */
-    public static void read(int idBuscada) {
+    public static boolean read(int idBuscada) {
 
         try {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            binaryFile.readInt();
+            binaryFile.seek(4);
 
-            boolean eof = false;
-            while (!eof) {
+            while (binaryFile.getFilePointer() < binaryFile.length()) {
                 Registro registro = new Registro();
                 registro.fbaLapideTamanho(binaryFile);
 
@@ -222,23 +221,23 @@ class Main {
                     registro.fbaFilme(binaryFile);
                     if (registro.getFilmeById() == idBuscada) {
                         System.out.println(registro.toString());
-                        break;
+                        return true;
                     }
                 } else {
                     binaryFile.seek(pos + registro.getTamanho());
                 }
                 // Verifica se chegou ao fim do arquivo
-                eof = (binaryFile.getFilePointer() == binaryFile.length());
+
             }
-            if (eof) {
-                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
-            }
+            System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+            
 
             // Fechar o arquivo
             binaryFile.close();
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+        return false;
     }
 
     /*
@@ -271,30 +270,28 @@ class Main {
     /*
      * Função responsável por deletar um registro no arquivo binário
      */
-    public static void delete(int idBuscado) {
+    public static boolean delete(int idBuscado) {
         try {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            binaryFile.readInt();
+            binaryFile.seek(4);
 
-            boolean eof = false;
-            while (!eof) {
+            while (binaryFile.getFilePointer() < binaryFile.length()) {
                 Registro registro = new Registro();
                 long pos = binaryFile.getFilePointer();
                 registro.fbaLapideTamanho(binaryFile);
-                long posFilme = binaryFile.getFilePointer();
+
                 if (!registro.getLapide()) {
                     registro.fbaFilme(binaryFile);
                     if (registro.getFilmeById() == idBuscado) {
                         binaryFile.seek(pos);
                         binaryFile.writeBoolean(true);
                         System.out.println("\nFilme com id " + idBuscado + " deletado com sucesso\n");
+                        return true;
                     }
                 } else {
-                    binaryFile.seek(posFilme + registro.getTamanho());
+                    binaryFile.seek(pos + 5 + registro.getTamanho());
                 }
 
-                // Verifica se chegou ao fim do arquivo
-                eof = (binaryFile.getFilePointer() == binaryFile.length());
             }
             System.out.println("\nFilme de id " + idBuscado + " não encontrado");
 
@@ -303,6 +300,7 @@ class Main {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+        return false;
     }
 
     /*
