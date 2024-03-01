@@ -308,59 +308,68 @@ class Main {
     /*
      * Função responsável por atualizar um registro no arquivo binário
      */
-    public static boolean update(Filme filme) {
+    public static boolean update(Filme novoFilme) {
+        RandomAccessFile binaryFile = null;
+    
         try {
-            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
-            binaryFile.readInt();
-
-            boolean eof = false;
-            while (!eof) {
-                Registro registro = new Registro();
+            binaryFile = new RandomAccessFile(pathBin, "rw");
+    
+            // Mover para o primeiro registro do arquivo (após cabeçalho)
+            binaryFile.seek(4);
+    
+            while (binaryFile.getFilePointer() < binaryFile.length()) { 
                 long pos = binaryFile.getFilePointer();
+                Registro registro = new Registro();
                 registro.fbaLapideTamanho(binaryFile);
-
-                long posFilme = binaryFile.getFilePointer();
-
+    
                 if (!registro.getLapide()) {
                     registro.fbaFilme(binaryFile);
-
-                    if (registro.getFilmeById() == filme.getId()) {
-
-                        Registro novoRegistro = new Registro(filme);
+                    
+                    if (registro.getFilmeById() == novoFilme.getId()) {
+                        Registro novoRegistro = new Registro(novoFilme);
+    
                         if (novoRegistro.getTamanho() <= registro.getTamanho()) {
-
-                            binaryFile.seek(pos);
-                            novoRegistro.setTamanho(registro.getTamanho());
+                            binaryFile.seek(pos); 
+                            novoRegistro.setTamanho(registro.getTamanho()); 
                             binaryFile.write(novoRegistro.toBinaryArray());
-
-                        } else {
-                            binaryFile.seek(pos);
-                            binaryFile.writeBoolean(true);
-                            binaryFile.seek(binaryFile.length());
-                            binaryFile.write(novoRegistro.toBinaryArray());
+                        } 
+                        else {
+                            binaryFile.seek(pos); 
+                            binaryFile.writeBoolean(true); 
+                            binaryFile.seek(binaryFile.length()); 
+                            binaryFile.write(novoRegistro.toBinaryArray()); 
                         }
+                        
+                        System.out.println("\nFilme com id " + novoFilme.getId() + " atualizado com sucesso\n");
 
-                        System.out.println("\nFilme com id " + filme.getId() + " atualizado com sucesso\n");
-                        return true;
-                    } else {
-                        binaryFile.seek(posFilme + registro.getTamanho());
-                    }
+                        return true; 
+                    } 
+                } else {
+                    // Se lápide é verdadeira, apenas pula para o próximo registro
+                    binaryFile.seek(pos + 5 + registro.getTamanho());
                 }
-                // Verifica se chegou ao fim do arquivo
-                eof = (binaryFile.getFilePointer() == binaryFile.length());
             }
-            if (eof) {
-                System.out.println("\nFilme de id " + filme.getId() + " não encontrado");
-            }
-
-            // Fechar o arquivo
-            binaryFile.close();
-            return false;
+            
+            // Filme não encontrado após varrer todo o arquivo
+            System.out.println("\nFilme com id " + novoFilme.getId() + " não encontrado.");
+    
         } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return false;
+            System.err.println("IOException: " + e.getMessage());
+        } finally {
+            if (binaryFile != null) {
+                try {
+                    binaryFile.close();
+                } catch (IOException e) {
+                    System.err.println("IOException ao fechar o arquivo: " + e.getMessage());
+                }
+            }
         }
+    
+        return false;
     }
+    
+    
+
 
     public static int registersCounter() {
         int count = 0;
