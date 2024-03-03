@@ -18,7 +18,7 @@ class Main {
                 + "3. Criar um registro\n"
                 + "4. Deletar um registro\n"
                 + "5. Atualizar um registro\n"
-                + "6. ordenação Externa\n"
+                + "6. Ordenação Externa\n"
                 + "7. Sair do Programa");
 
         System.out.print("Digite sua opção : ");
@@ -44,9 +44,10 @@ class Main {
             Filme filme = new Filme();
 
             System.out.println("\n---------------------------------");
-
+            in.nextLine();
+            
             System.out.print("\nDigite o título do filme: ");
-            filme.setTitle(in.next());
+            filme.setTitle(in.nextLine());
 
             System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
             filme.setReleaseDate(in.next());
@@ -84,9 +85,10 @@ class Main {
 
             System.out.print("Digite o id do filme que você deseja atualizar: ");
             filme.setId(in.nextInt());
+            in.nextLine();
 
             System.out.print("Digite o título do filme: ");
-            filme.setTitle(in.next());
+            filme.setTitle(in.nextLine());
 
             System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
             filme.setReleaseDate(in.next());
@@ -232,7 +234,6 @@ class Main {
                 } else {
                     binaryFile.seek(pos + registro.getTamanho());
                 }
-                // Verifica se chegou ao fim do arquivo
 
             }
             System.out.println("\nFilme de id " + idBuscada + " não encontrado");
@@ -404,6 +405,7 @@ class Main {
 
     public static void distribuicao() {
         try {
+            //distribui o arq em 2, ordena em blocos de 1000.
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "r");
             RandomAccessFile tmp1 = new RandomAccessFile("./tp01/temp/tmp1.db", "rw");
             RandomAccessFile tmp2 = new RandomAccessFile("./tp01/temp/tmp2.db", "rw");
@@ -461,7 +463,7 @@ class Main {
     }
 
     public static void intercalacao() {
-
+        //junta os blocos ordenados e grava em outro arquivo
         try {
             RandomAccessFile tmp1 = new RandomAccessFile("./tp01/temp/tmp1.db", "rw");
             RandomAccessFile tmp2 = new RandomAccessFile("./tp01/temp/tmp2.db", "rw");
@@ -543,6 +545,7 @@ class Main {
     }
 
     public static void copyBinaryFile() throws IOException {
+
         RandomAccessFile sourceFile = new RandomAccessFile("./tp01/temp/tmp3.db", "r");
         RandomAccessFile destFile = new RandomAccessFile("./tp01/dados/filmesBin_ordenado.db", "rw");
 
