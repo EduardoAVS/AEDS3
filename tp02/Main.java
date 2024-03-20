@@ -3,9 +3,122 @@ import java.util.Scanner;
 
 class Main {
     private static Scanner in = new Scanner(System.in);
-    private static final String pathCSV = "./tp02/dados/filmes.csv";
-    private static final String pathBin = "./tp02/dados/filmesBin.db";
-    private static final String pathIndex = "./tp02/dados/filmesIndex.db";
+    private static final String pathCSV = "./dados/filmes.csv";
+    private static final String pathBin = "./dados/filmesBin.db";
+    private static final String pathIndex = "./dados/filmesIndex.db";
+    private static BTree tree;
+
+    /*----------------------------------------- Menu -----------------------------------------*/
+
+    public static void menu() {
+
+        int op;
+
+        System.out.println("1. Realizar carga da base de dados\n"
+                + "2. Ler um registro\n"
+                + "3. Criar um registro\n"
+                + "4. Deletar um registro\n"
+                + "5. Atualizar um registro\n"
+                + "6. Sair do Programa");
+
+        System.out.print("Digite sua opção : ");
+        op = in.nextInt();
+
+        if (op < 1 || op > 7) {
+            System.out.println("\n---------------------------------");
+            System.out.println("Opção inválida!");
+            System.out.println("---------------------------------\n");
+
+            menu();
+        } else if (op == 1) {
+            escreverArquivoBin();
+            System.out.println("\n---------------------------------");
+            System.out.println("Arquivo criado com sucesso!");
+            System.out.println("---------------------------------\n");
+        } else if (op == 2) {
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja procurar: ");
+            read(in.nextInt());
+            System.out.println("---------------------------------\n");
+        } /*
+           * else if (op == 3) {
+           * Filme filme = new Filme();
+           * 
+           * System.out.println("\n---------------------------------");
+           * in.nextLine();
+           * 
+           * System.out.print("\nDigite o título do filme: ");
+           * filme.setTitle(in.nextLine());
+           * 
+           * System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+           * filme.setReleaseDate(in.next());
+           * 
+           * System.out.print("Digite a média de votos: ");
+           * filme.setVoteAvarage(in.nextFloat());
+           * in.nextLine(); // Consumir a nova linha
+           * 
+           * System.out.print("Digite a língua original (sigla com apenas duas letras): "
+           * );
+           * filme.setOriginalLanguage(in.nextLine());
+           * 
+           * System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
+           * String aux = in.nextLine();
+           * String[] genres = aux.split(",");
+           * filme.setGenres(genres);
+           * 
+           * if (create(filme)) {
+           * System.out.println("\nFilme adicionado com sucesso!");
+           * } else {
+           * System.out.println("\nErro ao adicionar o filme!");
+           * }
+           * 
+           * System.out.println("---------------------------------\n");
+           * 
+           * } else if (op == 4) {
+           * System.out.println("\n---------------------------------");
+           * System.out.print("Digite o id do filme que você deseja deletar: ");
+           * delete(in.nextInt());
+           * 
+           * System.out.println("---------------------------------\n");
+           * } else if (op == 5) {
+           * Filme filme = new Filme();
+           * 
+           * System.out.println("\n---------------------------------");
+           * 
+           * System.out.print("Digite o id do filme que você deseja atualizar: ");
+           * filme.setId(in.nextInt());
+           * in.nextLine();
+           * 
+           * System.out.print("Digite o título do filme: ");
+           * filme.setTitle(in.nextLine());
+           * 
+           * System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+           * filme.setReleaseDate(in.next());
+           * 
+           * System.out.print("Digite a média de votos: ");
+           * filme.setVoteAvarage(in.nextFloat());
+           * in.nextLine(); // Consumir a nova linha
+           * 
+           * System.out.print("Digite a língua original (sigla com apenas duas letras): "
+           * );
+           * filme.setOriginalLanguage(in.nextLine());
+           * 
+           * System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
+           * String aux = in.nextLine();
+           * String[] genres = aux.split(",");
+           * filme.setGenres(genres);
+           * 
+           * update(filme);
+           * 
+           * System.out.println("---------------------------------\n");
+           * 
+           * }
+           */
+
+        if (op != 6) {
+            menu();
+        }
+    }
 
     /*----------------------------------------- Carregar Arquivo Bin -----------------------------------------*/
 
@@ -73,13 +186,17 @@ class Main {
 
             long pos = 0;
             String linha;
+            tree = new BTree(8);
             while ((linha = arqCSV.readLine()) != null) {
                 Filme filme = manipularLinha(linha);
                 Registro registro = new Registro(filme);
                 pos = binaryFile.getFilePointer();
                 binaryFile.write(registro.toBinaryArray());
-                indexFile.writeInt(filme.getId());
-                indexFile.writeLong(pos);
+
+                Index index = new Index(filme.getId(), pos);
+                tree.insert(index);
+                // indexFile.writeInt(filme.getId());
+                // indexFile.writeLong(pos);
             }
 
             binaryFile.seek(pos + 5);
@@ -96,7 +213,38 @@ class Main {
         }
     }
 
+    /*----------------------------------------- CRUD -----------------------------------------*/
+
+    /*
+     * Função responsável por ler um registro no arquivo binário
+     */
+    public static void read(int idBuscada) {
+
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+
+            Index index = tree.search(idBuscada);
+
+            if (index == null) {
+                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+            } else {
+                binaryFile.seek(index.getPos());
+                Registro registro = new Registro();
+                registro.fromBinaryArray(binaryFile);
+                if (!registro.getLapide()) {
+                    System.out.println(registro.toString());
+                }
+            }
+
+            // Fechar o arquivo
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     public static void main(String[] rags) {
         escreverArquivoBin();
+        read(24);
     }
 }
