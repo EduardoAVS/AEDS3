@@ -195,8 +195,8 @@ class Main {
 
                 Index index = new Index(filme.getId(), pos);
                 tree.insert(index);
-                // indexFile.writeInt(filme.getId());
-                // indexFile.writeLong(pos);
+                //indexFile.writeInt(filme.getId());
+                //indexFile.writeLong(pos);
             }
 
             binaryFile.seek(pos + 5);
@@ -245,6 +245,6 @@ class Main {
 
     public static void main(String[] rags) {
         escreverArquivoBin();
-        read(24);
+        read(0);
     }
 }
