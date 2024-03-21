@@ -19,12 +19,16 @@ public class Bucket {
             return true;
         }
         else{
-            if(diretorio.getP() == pLocal){
-                diretorio.setP(++pLocal);
-            }
-            ++pLocal;
+            
             return false;
             //Bucket cheio
+        }
+    }
+
+    void imprimir(){
+        for(int i = 0; i < registros.size(); i++){
+            System.out.println(registros.get(i).getId() + "  " + registros.get(i).getPos());
+
         }
     }
 }
