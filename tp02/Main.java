@@ -8,6 +8,7 @@ class Main {
     private static final String pathIndex = "./tp02/dados/filmesIndex.db";
     private static final String pathBTree = "./tp02/dados/filmesBTree.ser";
     private static BTree tree = null;
+    private static HashingDinamico hash;
 
     /*----------------------------------------- Menu -----------------------------------------*/
 
@@ -188,6 +189,8 @@ class Main {
 
             long pos = 0;
             String linha;
+            tree = new BTree(8);
+            hash = new HashingDinamico(1);
             while ((linha = arqCSV.readLine()) != null) {
                 Filme filme = manipularLinha(linha);
                 Registro registro = new Registro(filme);
@@ -196,6 +199,7 @@ class Main {
 
                 Index index = new Index(filme.getId(), pos);
                 tree.insert(index);
+                hash.insertIndex(index);
                 // indexFile.writeInt(filme.getId());
                 // indexFile.writeLong(pos);
             }
@@ -397,5 +401,7 @@ class Main {
 
     public static void main(String[] rags) {
         menu();
+        escreverArquivoBin();
+        hash.imprimirHash();
     }
 }
