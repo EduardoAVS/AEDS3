@@ -1,4 +1,7 @@
-class BTree {
+import java.io.Serializable;
+
+class BTree implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private int t; // Ordem da árvore
     private Node root; // Raiz da árvore
@@ -6,6 +9,28 @@ class BTree {
     public BTree(int t) {
         this.t = t;
         this.root = new Node(t);
+    }
+
+    public void setNewPos(Index index) {
+        find(index, root);
+    }
+
+    private void find(Index index, Node i) {
+        int j;
+        for (j = 0; j < i.n; j++) {
+            if (index.getId() < i.key[j].getId()) {
+                break;
+            } else if (index.getId() == i.key[j].getId()) {
+                i.key[j].setPos(index.getPos());
+                return;
+            }
+        }
+
+        if (i.leaf) {
+            return;
+        } else {
+            find(index, i.child[j]);
+        }
     }
 
     // Inserção
@@ -91,24 +116,53 @@ class BTree {
         }
     }
 
-    public void imprimirArvore() {
-        int[] contador = new int[1]; // contador para armazenar o número de IDs impressos
-        imprimirNo(root, contador);
-        System.out.println("Total de IDs impressos: " + contador[0]); // imprime o total de IDs
-    }
-
-    private void imprimirNo(Node no, int[] contador) {
-        for (int i = 0; i < no.n; i++) {
-            System.out.print(no.key[i].getId() + " ");
-            contador[0]++; // incrementa o contador a cada ID impresso
-        }
-        System.out.println();
-
-        if (!no.leaf) {
-            for (int i = 0; i <= no.n; i++) {
-                imprimirNo(no.child[i], contador);
+    // Remover
+    private Index Remove(Node x, int id) {
+        int i = 0;
+        if (x.leaf) {
+            for (i = 0; i < x.n; i++) {
+                if (id == x.key[i].getId()) {
+                    break;
+                }
             }
+            if (i == x.n) {
+                return null; // Chave não encontrada
+            }
+            Index removedKey = x.key[i];
+            for (int j = i; j < x.n - 1; j++) {
+                x.key[j] = x.key[j + 1];
+            }
+            x.n--;
+            return removedKey;
+        } else {
+            for (i = 0; i < x.n; i++) {
+                if (id < x.key[i].getId()) {
+                    break;
+                }
+            }
+            Index removedKey = Remove(x.child[i], id);
+            if (removedKey == null) {
+                for (int j = i; j < x.n - 1; j++) {
+                    x.key[j] = x.key[j + 1];
+                    x.child[j + 1] = x.child[j + 2];
+                }
+                x.n--;
+                if (x.n == 0) {
+                    if (x == root) {
+                        root = x.child[0];
+                    }
+                    x = x.child[0];
+                }
+            }
+            return removedKey;
         }
     }
 
+    public Index Remove(int id) {
+        Index removedKey = Remove(root, id);
+        if (root.n == 0) {
+            root = root.child[0];
+        }
+        return removedKey;
+    }
 }
