@@ -203,7 +203,7 @@ class Main {
 
                 Index index = new Index(filme.getId(), pos);
                 tree.insert(index);
-                hash.insertIndex(index);
+                hash.insert(index);
                 // indexFile.writeInt(filme.getId());
                 // indexFile.writeLong(pos);
             }
@@ -402,17 +402,21 @@ class Main {
         }
     }
     /*----------------------------------------- CRUD Hash Dinâmico ----------------------------------------------------------*/
+    
+    /*
+     * Função responsável por ler um registro no arquivo binário
+     */
+
     public static void readHash(int idBuscada) {
 
         try {
             RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
 
             Index index = hash.search(idBuscada);
-            System.out.println("B");
             if (index == null) {
                 System.out.println("\nFilme de id " + idBuscada + " não encontrado");
             } else {
-                System.out.println("a");
+
                 binaryFile.seek(index.getPos());
                 Registro registro = new Registro();
                 registro.fromBinaryArray(binaryFile);
@@ -429,9 +433,66 @@ class Main {
             System.err.println(e.getMessage());
         }
     }
+
+    /*
+     * Função responsável por criar um registro no arquivo binário
+     */
+    public static boolean createHash(Filme filme) {
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+            Registro registro = new Registro(filme);
+
+            binaryFile.seek(0);
+            int id = binaryFile.readInt() + 1;
+            filme.setId(id);
+
+            binaryFile.seek(0);
+            binaryFile.writeInt(id);
+
+            long pos = binaryFile.length();
+            binaryFile.seek(pos);
+            binaryFile.write(registro.toBinaryArray());
+
+            Index index = new Index(filme.getId(), pos);
+            hash.insert(index);
+            saveHashInFile();
+
+            // Fechar o arquivo
+            binaryFile.close();
+            return true;
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+    }
+
+    /*
+     * Função responsável por deletar um registro no arquivo binário
+     */
+    public static void deleteHash(int idBuscado) {
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+            binaryFile.seek(4);
+
+            Index index = hash.remove(idBuscado);
+            if (index == null) {
+                System.out.println("\nFilme de id " + idBuscado + " não encontrado");
+            } else {
+                binaryFile.seek(index.getPos());
+                binaryFile.writeBoolean(true);
+                System.out.println("\nFilme com id " + idBuscado + " deletado com sucesso\n");
+            }
+            saveInFile();
+
+            // Fechar o arquivo
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     /*----------------------------------------- Salvar o Hash Dinâmico em um Arquivo-----------------------------------------*/
 
-    //escrever P global e P local
     public static void saveHashInFile() {
         try {
             // Armazenar o objeto em um arquivo
@@ -468,11 +529,12 @@ class Main {
 
     /*----------------------------------------- Main -----------------------------------------*/
 
-    public static void main(String[] rags) {
+    public static void main(String[] args) {
         menu();
         //escreverArquivoBin();
+        /*readHash(0);
+        deleteHash(0);
+        readHash(0);*/
         //hash.imprimirHash();
-        //readHash(1390);
-       
     }
 }

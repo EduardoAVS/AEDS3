@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HashingDinamico implements Serializable {
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
     private int p;
     private List<Bucket> buckets;
 
@@ -31,18 +31,7 @@ public class HashingDinamico implements Serializable {
         return x % (int) Math.pow(2, novoP);
     }
 
-    public void insertIndex(Index registro){
-        int indiceBucket = hash(registro.getId());
-        Bucket bucket = buckets.get(indiceBucket);
-        // Insere o indice no bucket
-        if (!bucket.insert(registro)) {
-
-            // Aumenta o diretório
-            rebalancear(indiceBucket, registro);
-        }
-    }
-
-    public void rebalancear(int indiceBucketCheio, Index registroNovo){
+    public void duplicar(int indiceBucketCheio, Index registroNovo){
         int pLocal = buckets.get(indiceBucketCheio).getPLocal();
         int novoPlocal = pLocal + 1;
         int novoP = p;
@@ -72,13 +61,53 @@ public class HashingDinamico implements Serializable {
         }
 
         this.p = novoP; // Atualiza p depois da redistribuição
+
+        bucketCheio.setPLocal(novoPlocal);
         
         this.buckets = novosBuckets; // Atualiza a referência para os novos buckets
     }
 
+    public void diminuir(Bucket antigo, Bucket removido){
+        int pLocal = antigo.getPLocal();
+        List<Index> registros = new ArrayList<>(removido.getRegistros());
+
+        // Adiciona os registros do bucket removido no antigo
+        for(Index i : registros){
+            antigo.getRegistros().add(i);
+        }
+
+        antigo.setPLocal(--pLocal);
+    }
+
+    public void insert(Index registro){
+        int indiceBucket = hash(registro.getId());
+        Bucket bucket = buckets.get(indiceBucket);
+        // Insere o indice no bucket
+        if (!bucket.insert(registro)) {
+
+            // Aumenta o diretório
+            duplicar(indiceBucket, registro);
+        }
+    }
+
+
     public Index search(int id){
         int indice = hash(id);
         return buckets.get(indice).search(id);
+    }
+
+    public Index remove(int id){
+        int indice = hash(id);
+        Bucket bucketRemovido = buckets.get(indice);
+        int indiceAntigo = Math.abs(indice - bucketRemovido.getPLocal());
+        Bucket bucketAntigo = buckets.get(indiceAntigo);
+        Index removido = bucketRemovido.remove(id);
+        // Rebalancear
+        if((bucketAntigo.getRegistros().size() + bucketRemovido.getRegistros().size()) <= bucketAntigo.getTamanho()){
+            diminuir(bucketAntigo, bucketRemovido);
+            bucketRemovido = bucketAntigo;
+        }
+        return removido;
     }
 
     public void imprimirHash(){

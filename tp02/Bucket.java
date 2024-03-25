@@ -1,5 +1,4 @@
 
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +8,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Bucket implements Serializable{
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
     private final int tamanho = 200;
     private int pLocal;
     private List<Index> registros;
 
     private static final String hashTexto = "./dados/hash.txt";
     
+    int getTamanho(){
+        return tamanho;
+    }
     
     int getPLocal(){
         return pLocal;
@@ -34,6 +36,10 @@ public class Bucket implements Serializable{
         this.registros = new ArrayList<>();
     }
 
+    public void limparRegistros(){
+        registros.clear();
+    }
+
     public boolean insert(Index registro){
         if(registros.size() < tamanho){
             registros.add(registro);
@@ -46,15 +52,21 @@ public class Bucket implements Serializable{
         }
     }
 
-    public void limparRegistros(){
-        registros.clear();
+    public Index search(int id){
+        for(Index i : registros){
+            if(i.getId() == id){
+                return i;
+            }
+        }
+        return null;
     }
 
-    public Index search(int id){
-        for(int i = 0; i < registros.size(); i++){
-            if(registros.get(i).getId() == id){
-                System.out.println((registros.get(i).getId() + " " + registros.get(i).getPos()));
-                return registros.get(i);
+    public Index remove(int id){
+        // Remove o registro desejado
+        for(Index i : registros){
+            if(i.getId() == id){
+                registros.remove(i);
+                return i;
             }
         }
         return null;
