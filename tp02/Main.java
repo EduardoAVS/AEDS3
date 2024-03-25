@@ -3,10 +3,12 @@ import java.util.Scanner;
 
 class Main {
     private static Scanner in = new Scanner(System.in);
-    private static final String pathCSV = "./tp02/dados/filmes.csv";
-    private static final String pathBin = "./tp02/dados/filmesBin.db";
-    private static final String pathIndex = "./tp02/dados/filmesIndex.db";
-    private static final String pathBTree = "./tp02/dados/filmesBTree.ser";
+    private static final String pathCSV = "./dados/filmes.csv";
+    private static final String pathBin = "./dados/filmesBin.db";
+    private static final String pathIndex = "./dados/filmesIndex.db";
+    private static final String pathBTree = "./dados/filmesBTree.ser";
+    private static final String pathHash = "./dados/filmesHash.ser";
+
     private static BTree tree = null;
     private static HashingDinamico hash;
 
@@ -16,6 +18,7 @@ class Main {
 
         int op;
         readFromFile();
+        readHashFromFile();
 
         System.out.println("1. Realizar carga da base de dados\n"
                 + "2. Ler um registro\n"
@@ -116,6 +119,7 @@ class Main {
 
         else if (op == 6) {
             saveInFile();
+            saveHashInFile();
         }
 
         if (op != 6) {
@@ -209,6 +213,7 @@ class Main {
             binaryFile.seek(0);
             binaryFile.writeInt(id);
             saveInFile();
+            saveHashInFile();
 
             // Fechar o arquivo
             binaryFile.close();
@@ -219,7 +224,7 @@ class Main {
         }
     }
 
-    /*----------------------------------------- CRUD -----------------------------------------*/
+    /*----------------------------------------- CRUD B-tree-----------------------------------------*/
 
     /*
      * Função responsável por ler um registro no arquivo binário
@@ -396,12 +401,78 @@ class Main {
             }
         }
     }
+    /*----------------------------------------- CRUD Hash Dinâmico ----------------------------------------------------------*/
+    public static void readHash(int idBuscada) {
+
+        try {
+            RandomAccessFile binaryFile = new RandomAccessFile(pathBin, "rw");
+
+            Index index = hash.search(idBuscada);
+            System.out.println("B");
+            if (index == null) {
+                System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+            } else {
+                System.out.println("a");
+                binaryFile.seek(index.getPos());
+                Registro registro = new Registro();
+                registro.fromBinaryArray(binaryFile);
+                if (!registro.getLapide()) {
+                    System.out.println(registro.toString());
+                } else {
+                    System.out.println("\nFilme de id " + idBuscada + " não encontrado");
+                }
+            }
+
+            // Fechar o arquivo
+            binaryFile.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    /*----------------------------------------- Salvar o Hash Dinâmico em um Arquivo-----------------------------------------*/
+
+    //escrever P global e P local
+    public static void saveHashInFile() {
+        try {
+            // Armazenar o objeto em um arquivo
+            FileOutputStream fileOut = new FileOutputStream(pathHash);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(hash);
+            out.close();
+            fileOut.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
+
+    public static void readHashFromFile() {
+        File file = new File(pathHash);
+        if (!file.exists() || file.length() == 0) {
+            hash = new HashingDinamico(1);
+        } else {
+            try {
+                // Recuperar o objeto de um arquivo
+                FileInputStream fileIn = new FileInputStream(pathHash);
+                ObjectInputStream inp = new ObjectInputStream(fileIn);
+                hash = (HashingDinamico) inp.readObject();
+                inp.close();
+                fileIn.close();
+            } catch (IOException i) {
+                i.printStackTrace();
+            } catch (ClassNotFoundException c) {
+                System.out.println("Classe Hashing Dinâmico não encontrada");
+                c.printStackTrace();
+            }
+        }
+    }
 
     /*----------------------------------------- Main -----------------------------------------*/
 
     public static void main(String[] rags) {
         menu();
-        escreverArquivoBin();
-        hash.imprimirHash();
+        //escreverArquivoBin();
+        //hash.imprimirHash();
+        //readHash(1390);
+       
     }
 }
