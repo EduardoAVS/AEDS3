@@ -72,6 +72,15 @@ public class Bucket implements Serializable{
         return null;
     }
 
+    public void find(Index index){
+        for(Index i : registros){
+            if(i.getId() == index.getId()){
+                i.setPos(index.getPos());
+                return;
+            }
+        }
+    }
+
     void imprimir(){
         try (BufferedWriter hashArq = new BufferedWriter(new FileWriter(hashTexto, true))) {
             for(int i = 0; i < registros.size(); i++){

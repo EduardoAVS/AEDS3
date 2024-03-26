@@ -102,12 +102,19 @@ public class HashingDinamico implements Serializable {
         int indiceAntigo = Math.abs(indice - bucketRemovido.getPLocal());
         Bucket bucketAntigo = buckets.get(indiceAntigo);
         Index removido = bucketRemovido.remove(id);
+        
         // Rebalancear
         if((bucketAntigo.getRegistros().size() + bucketRemovido.getRegistros().size()) <= bucketAntigo.getTamanho()){
             diminuir(bucketAntigo, bucketRemovido);
             bucketRemovido = bucketAntigo;
         }
         return removido;
+    }
+
+    public void setNewPos(Index registro){
+
+        int indice = hash(registro.getId());
+        buckets.get(indice).find(registro);
     }
 
     public void imprimirHash(){

@@ -13,29 +13,67 @@ class Main {
     private static HashingDinamico hash;
 
     /*----------------------------------------- Menu -----------------------------------------*/
-
-    public static void menu() {
-
+    public static void menu(){
         int op;
-        readFromFile();
-        readHashFromFile();
-
-        System.out.println("1. Realizar carga da base de dados\n"
-                + "2. Ler um registro\n"
-                + "3. Criar um registro\n"
-                + "4. Deletar um registro\n"
-                + "5. Atualizar um registro\n"
-                + "6. Sair do Programa");
-
+        
+        System.out.println("\n---------------------------------");
+        System.out.println("Menu principal");
+        System.out.println("---------------------------------\n");
+        System.out.println("1. B Tree\n" + "2. Hash Dinâmico\n" + "3. Lista Invertida\n" + "4. Sair do programa");
         System.out.print("Digite sua opção : ");
         op = in.nextInt();
 
-        if (op < 1 || op > 7) {
+        if (op < 1 || op > 4) {
             System.out.println("\n---------------------------------");
             System.out.println("Opção inválida!");
             System.out.println("---------------------------------\n");
 
             menu();
+        }
+
+        else if(op == 1){
+            
+            System.out.println("\n---------------------------------");
+            System.out.println("B tree");
+            System.out.println("---------------------------------\n");
+            menuBTree();
+        }
+
+        else if(op == 2){
+            System.out.println("\n---------------------------------");
+            System.out.println("Hash Dinâmico");
+            System.out.println("---------------------------------\n");
+            menuHash();
+        }
+
+        else if(op == 4){
+            return;
+        }
+
+        
+    }
+    public static void menuBTree() {
+
+        int op;
+        readFromFile();
+
+        System.out.println("\n1. Realizar carga da base de dados\n"
+                + "2. Ler um registro\n"
+                + "3. Criar um registro\n"
+                + "4. Deletar um registro\n"
+                + "5. Atualizar um registro\n"
+                + "6. Voltar para o menu principal\n"
+                + "7. Sair do programa");
+
+        System.out.print("Digite sua opção : ");
+        op = in.nextInt();
+
+        if (op < 1 || op > 8) {
+            System.out.println("\n---------------------------------");
+            System.out.println("Opção inválida!");
+            System.out.println("---------------------------------\n");
+
+            menuBTree();
         } else if (op == 1) {
             escreverArquivoBin();
             System.out.println("\n---------------------------------");
@@ -118,12 +156,135 @@ class Main {
         }
 
         else if (op == 6) {
+            menu();
+        }
+
+        else if (op == 7) {
             saveInFile();
+        }
+
+        if (op != 7) {
+            menuBTree();
+        }
+    }
+
+    public static void menuHash() {
+
+        int op;
+        readHashFromFile();
+
+        System.out.println("\n1. Realizar carga da base de dados\n"
+                + "2. Ler um registro\n"
+                + "3. Criar um registro\n"
+                + "4. Deletar um registro\n"
+                + "5. Atualizar um registro\n"
+                + "6. Voltar para o menu principal\n"
+                + "7. Sair do programa");
+
+        System.out.print("Digite sua opção : ");
+        op = in.nextInt();
+
+        if (op < 1 || op > 8) {
+            System.out.println("\n---------------------------------");
+            System.out.println("Opção inválida!");
+            System.out.println("---------------------------------\n");
+
+            menuBTree();
+        } else if (op == 1) {
+            escreverArquivoBin();
+            System.out.println("\n---------------------------------");
+            System.out.println("Arquivo criado com sucesso!");
+            System.out.println("---------------------------------\n");
+        } else if (op == 2) {
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja procurar: ");
+            readHash(in.nextInt());
+            System.out.println("---------------------------------\n");
+        } else if (op == 3) {
+            Filme filme = new Filme();
+
+            System.out.println("\n---------------------------------");
+            in.nextLine();
+
+            System.out.print("\nDigite o título do filme: ");
+            filme.setTitle(in.nextLine());
+
+            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+            filme.setReleaseDate(in.next());
+
+            System.out.print("Digite a média de votos: ");
+            filme.setVoteAvarage(in.nextFloat());
+            in.nextLine(); // Consumir a nova linha
+
+            System.out.print("Digite a língua original (sigla com apenas duas letras): ");
+            filme.setOriginalLanguage(in.nextLine());
+
+            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
+            String aux = in.nextLine();
+            String[] genres = aux.split(",");
+            filme.setGenres(genres);
+
+            if (createHash(filme)) {
+                System.out.println("\nFilme adicionado com sucesso!");
+            } else {
+                System.out.println("\nErro ao adicionar o filme!");
+            }
+
+            System.out.println("---------------------------------\n");
+
+        } else if (op == 4) {
+            System.out.println("\n---------------------------------");
+            System.out.print("Digite o id do filme que você deseja deletar: ");
+            deleteHash(in.nextInt());
+
+            System.out.println("---------------------------------\n");
+        } else if (op == 5) {
+            Filme filme = new Filme();
+
+            System.out.println("\n---------------------------------");
+
+            System.out.print("Digite o id do filme que você deseja atualizar: ");
+            filme.setId(in.nextInt());
+            in.nextLine();
+
+            System.out.print("Digite o título do filme: ");
+            filme.setTitle(in.nextLine());
+
+            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+            filme.setReleaseDate(in.next());
+
+            System.out.print("Digite a média de votos: ");
+            filme.setVoteAvarage(in.nextFloat());
+            in.nextLine(); // Consumir a nova linha
+
+            System.out.print("Digite a língua original (sigla com apenas duas letras):");
+            filme.setOriginalLanguage(in.nextLine());
+
+            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
+            String aux = in.nextLine();
+            String[] genres = aux.split(",");
+            filme.setGenres(genres);
+
+            updateHash(filme);
+
+            System.out.println("---------------------------------\n");
+
+        }
+
+        else if (op == 6) {
+            System.out.println("\n---------------------------------");
+            System.out.println("Voltando para o menu principal");
+            System.out.println("---------------------------------\n");
+            menu();
+        }
+
+        else if (op == 7) {
             saveHashInFile();
         }
 
-        if (op != 6) {
-            menu();
+
+        if (op != 7) {
+            menuHash();
         }
     }
 
@@ -491,6 +652,59 @@ class Main {
         }
     }
 
+    /*
+     * Função responsável por atualizar um registro no arquivo binário
+     */
+    public static void updateHash(Filme novoFilme) {
+        RandomAccessFile binaryFile = null;
+
+        try {
+            binaryFile = new RandomAccessFile(pathBin, "rw");
+
+            // Mover para o primeiro registro do arquivo (após cabeçalho)
+            binaryFile.seek(4);
+
+            Index index = hash.search(novoFilme.getId());
+            Registro novoRegistro = new Registro(novoFilme);
+            Registro registro = new Registro();
+            if (index != null) {
+                binaryFile.seek(index.getPos());
+                registro.fromBinaryArray(binaryFile);
+
+                if (novoRegistro.getTamanho() <= registro.getTamanho()) {
+                    binaryFile.seek(index.getPos());
+                    novoRegistro.setTamanho(registro.getTamanho());
+                    binaryFile.write(novoRegistro.toBinaryArray());
+                } else {
+                    binaryFile.seek(index.getPos());
+                    binaryFile.writeBoolean(true);
+                    index.setPos(binaryFile.length());
+                    binaryFile.seek(index.getPos());
+                    binaryFile.write(novoRegistro.toBinaryArray());
+                    hash.setNewPos(index);
+                }
+
+                System.out.println("\nFilme com id " + novoFilme.getId() + " atualizado com sucesso\n");
+                saveInFile();
+            } else {
+
+                // Filme não encontrado após varrer todo o arquivo
+                System.out.println("\nFilme com id " + novoFilme.getId() + " não encontrado.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        } finally {
+            if (binaryFile != null) {
+                try {
+                    binaryFile.close();
+                } catch (IOException e) {
+                    System.err.println("IOException ao fechar o arquivo: " + e.getMessage());
+                }
+            }
+        }
+    }
+
     /*----------------------------------------- Salvar o Hash Dinâmico em um Arquivo-----------------------------------------*/
 
     public static void saveHashInFile() {
@@ -531,8 +745,39 @@ class Main {
 
     public static void main(String[] args) {
         menu();
-        //escreverArquivoBin();
-        /*readHash(0);
+        /*escreverArquivoBin();
+        readHash(0);
+        Filme filme = new Filme();
+
+            System.out.println("\n---------------------------------");
+
+            System.out.print("Digite o id do filme que você deseja atualizar: ");
+            filme.setId(in.nextInt());
+            in.nextLine();
+
+            System.out.print("Digite o título do filme: ");
+            filme.setTitle(in.nextLine());
+
+            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
+            filme.setReleaseDate(in.next());
+
+            System.out.print("Digite a média de votos: ");
+            filme.setVoteAvarage(in.nextFloat());
+            in.nextLine(); // Consumir a nova linha
+
+            System.out.print("Digite a língua original (sigla com apenas duas letras):");
+            filme.setOriginalLanguage(in.nextLine());
+
+            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
+            String aux = in.nextLine();
+            String[] genres = aux.split(",");
+            filme.setGenres(genres);
+
+            updateHash(filme);
+
+            System.out.println("---------------------------------\n");
+        readHash(0);
+        
         deleteHash(0);
         readHash(0);*/
         //hash.imprimirHash();
