@@ -745,41 +745,5 @@ class Main {
 
     public static void main(String[] args) {
         menu();
-        /*escreverArquivoBin();
-        readHash(0);
-        Filme filme = new Filme();
-
-            System.out.println("\n---------------------------------");
-
-            System.out.print("Digite o id do filme que você deseja atualizar: ");
-            filme.setId(in.nextInt());
-            in.nextLine();
-
-            System.out.print("Digite o título do filme: ");
-            filme.setTitle(in.nextLine());
-
-            System.out.print("Digite a data de lançamento (yyyy-MM-dd): ");
-            filme.setReleaseDate(in.next());
-
-            System.out.print("Digite a média de votos: ");
-            filme.setVoteAvarage(in.nextFloat());
-            in.nextLine(); // Consumir a nova linha
-
-            System.out.print("Digite a língua original (sigla com apenas duas letras):");
-            filme.setOriginalLanguage(in.nextLine());
-
-            System.out.print("Digite os gêneros desse filme (separe com vírgula): ");
-            String aux = in.nextLine();
-            String[] genres = aux.split(",");
-            filme.setGenres(genres);
-
-            updateHash(filme);
-
-            System.out.println("---------------------------------\n");
-        readHash(0);
-        
-        deleteHash(0);
-        readHash(0);*/
-        //hash.imprimirHash();
     }
 }
